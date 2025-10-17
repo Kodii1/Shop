@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Shop.Api.Dtos;
 using Shop.Api.Mappers;
 using Shop.Api.Models;
@@ -57,18 +56,7 @@ public class UserController : ControllerBase
         }
         try
         {
-            var user = new ApplicationUser
-            {
-                UserName = userRegisterDto.FirstName + userRegisterDto.LastName,
-                FirstName = userRegisterDto.FirstName,
-                LastName = userRegisterDto.LastName,
-                Email = userRegisterDto.Email,
-                NormalizedEmail = userRegisterDto.Email.ToUpper(),
-                CreatedAt = DateTime.UtcNow,
-                LastLogin = DateTime.UtcNow,
-
-            };
-            //TODO: VALIDATE PASSWORD
+            var user = userRegisterDto.ToModel();
             var result = await _userManager.CreateAsync(user, userRegisterDto.Password);
 
             if (!result.Succeeded)
@@ -81,7 +69,8 @@ public class UserController : ControllerBase
 
             }
 
-            return CreatedAtRoute("GetUser", new { id = user.Id }, user.ToDto());        }
+            return CreatedAtRoute("GetUser", new { id = user.Id }, user.ToDto());
+        }
         catch
         {
             return StatusCode(500, new { Error = "Internal server error" });

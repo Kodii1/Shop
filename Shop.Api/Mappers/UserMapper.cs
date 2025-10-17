@@ -12,5 +12,19 @@ public static class UserMapper
             user.LastName,
             user.Email!);
     }
+    public static ApplicationUser ToModel(this UserRegisterDto userRegisterDto)
+    {
+        return new ApplicationUser
+        {
+            UserName = userRegisterDto.FirstName + userRegisterDto.LastName,
+            FirstName = userRegisterDto.FirstName,
+            LastName = userRegisterDto.LastName,
+            Email = userRegisterDto.Email,
+            NormalizedEmail = userRegisterDto.Email.ToUpper(),
+            CreatedAt = DateTime.UtcNow,
+            LastLogin = DateTime.UtcNow,
 
+        };
+
+    }
 }
