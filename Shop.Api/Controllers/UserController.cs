@@ -35,7 +35,7 @@ public class UserController : ControllerBase
     //     return users;
     // }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id}", Name = "GetUser")]
     public async Task<ActionResult<UserDto>> GetUserAsync(string id)
     {
         var user = await _userManager.FindByIdAsync(id);
@@ -59,6 +59,7 @@ public class UserController : ControllerBase
         {
             var user = new ApplicationUser
             {
+                UserName = userRegisterDto.FirstName + userRegisterDto.LastName,
                 FirstName = userRegisterDto.FirstName,
                 LastName = userRegisterDto.LastName,
                 Email = userRegisterDto.Email,
@@ -80,17 +81,7 @@ public class UserController : ControllerBase
 
             }
 
-            return CreatedAtAction(
-                nameof(GetUserAsync),
-                new { id = user.Id },
-                new
-                {
-                    Message = "User registered successfully",
-                    UserId = user.Id,
-                    Email = user.Email
-                });
-
-        }
+            return CreatedAtRoute("GetUser", new { id = user.Id }, user.ToDto());        }
         catch
         {
             return StatusCode(500, new { Error = "Internal server error" });
