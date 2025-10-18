@@ -24,21 +24,6 @@ public class UserController : ControllerBase
         _jwtService = jwtService;
     }
 
-    // [HttpGet("")]
-    // public async Task<ActionResult<List<UserDto>>> GetAllUsersAsync()
-    // {
-    //     var users = await _userManager.Users
-    //                                   .Select(user => user.ToDto())
-    //                                   .AsNoTracking()
-    //                                   .ToListAsync();
-    //
-    //     if (users == null)
-    //     {
-    //         return NotFound();
-    //     }
-    //
-    //     return users;
-    // }
 
     [HttpGet("{id}", Name = "GetUser")]
     [Authorize]
