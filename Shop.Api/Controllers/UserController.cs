@@ -1,12 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Shop.Api.Dtos;
+using Shop.Api.Interfaces;
 using Shop.Api.Mappers;
 using Shop.Api.Models;
 
@@ -19,12 +15,13 @@ public class UserController : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _singInManager;
-    private readonly IConfiguration _configuration;
-    public UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+    private readonly IJwtService _jwtService;
+
+    public UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService)
     {
         _userManager = userManager;
         _singInManager = signInManager;
-        _configuration = configuration;
+        _jwtService = jwtService;
     }
 
     // [HttpGet("")]
@@ -42,15 +39,6 @@ public class UserController : ControllerBase
     //
     //     return users;
     // }
-
-
-    [HttpGet("testauth")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public IActionResult TestAuth()
-    {
-        return Ok("Authorized!");
-    }
-
 
     [HttpGet("{id}", Name = "GetUser")]
     [Authorize]
@@ -103,27 +91,9 @@ public class UserController : ControllerBase
         var result = await _singInManager.CheckPasswordSignInAsync(user, userLoginDto.Password, false);
         if (!result.Succeeded) return BadRequest("Wrong Password");
 
-        var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-            new Claim(JwtRegisteredClaimNames.GivenName, user.UserName!),
-        };
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(7),
-            SigningCredentials = credentials,
-            Issuer = _configuration["Jwt:Issuer"],
-            Audience = _configuration["Jwt:Audience"]
-        };
+        var token = _jwtService.GenerateToken(user);
 
-        var tokenHandler = new JwtSecurityTokenHandler();
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-
-        return Ok(tokenHandler.WriteToken(token));
+        return Ok(token);
 
     }
 }
