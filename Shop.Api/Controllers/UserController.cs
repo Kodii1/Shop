@@ -24,9 +24,8 @@ public class UserController : ControllerBase
         _jwtService = jwtService;
     }
 
-
-    [HttpGet("{id}", Name = "GetUser")]
-    [Authorize]
+    [Authorize(Roles = "ADMIN")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<UserDto>> GetUserAsync(string id)
     {
         Console.WriteLine($"GetUserAsync called with id: {id}");
@@ -52,8 +51,9 @@ public class UserController : ControllerBase
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
                 return BadRequest(ModelState);
-
             }
+
+            await _userManager.AddToRoleAsync(user, "USER");
 
             return Ok();
         }
@@ -76,7 +76,7 @@ public class UserController : ControllerBase
         var result = await _singInManager.CheckPasswordSignInAsync(user, userLoginDto.Password, false);
         if (!result.Succeeded) return BadRequest("Wrong Password");
 
-        var token = _jwtService.GenerateToken(user);
+        var token = await _jwtService.GenerateToken(user);
 
         return Ok(token);
 
