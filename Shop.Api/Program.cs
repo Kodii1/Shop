@@ -1,5 +1,8 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shop.Api.Data;
 using Shop.Api.Models;
@@ -29,6 +32,29 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme =
+    options.DefaultChallengeScheme =
+    options.DefaultForbidScheme =
+    options.DefaultSignInScheme =
+    options.DefaultScheme =
+    options.DefaultSignOutScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidateIssuerSigningKey = true,
+        ValidateLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+    };
+});
+;
 
 builder.Services.AddControllers();
 
@@ -39,8 +65,6 @@ builder.Services.AddSwaggerGen(options =>
 
 
 var app = builder.Build();
-
-app.MapControllers();
 
 if (app.Environment.IsDevelopment())
 {
@@ -95,10 +119,11 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapControllers();
 
 app.Run();
