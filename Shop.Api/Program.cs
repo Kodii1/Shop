@@ -95,6 +95,16 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -153,6 +163,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors("AllowReactDev");
 
 app.UseHttpsRedirection();
 app.UseRouting();

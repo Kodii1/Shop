@@ -17,7 +17,8 @@ public class UserController : ControllerBase
     private readonly SignInManager<ApplicationUser> _singInManager;
     private readonly IJwtService _jwtService;
 
-    public UserController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IJwtService jwtService)
+    public UserController(UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager, IJwtService jwtService)
     {
         _userManager = userManager;
         _singInManager = signInManager;
@@ -70,7 +71,6 @@ public class UserController : ControllerBase
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var user = await _userManager.FindByEmailAsync(userLoginDto.Email);
-
         if (user == null) return BadRequest("Wrong Email");
 
         var result = await _singInManager.CheckPasswordSignInAsync(user, userLoginDto.Password, false);
