@@ -56,7 +56,9 @@ public class UserController : ControllerBase
 
             await _userManager.AddToRoleAsync(user, "USER");
 
-            return Ok();
+            var token = await _jwtService.GenerateToken(user);
+
+            return Ok(token);
         }
         catch
         {

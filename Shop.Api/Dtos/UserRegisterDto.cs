@@ -14,10 +14,12 @@ public record UserRegisterDto(
     [MaxLength(20, ErrorMessage = "Last name needs to be a maximum of 20 characters long")]
     string LastName,
 
-    [Required(ErrorMessage = "Password is required")]
-    string Password,
-
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Invalid email format")]
-    string Email
+    string Email,
+
+    [Required(ErrorMessage = "Password is required")]
+    string Password
+
+
 );

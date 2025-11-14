@@ -39,7 +39,7 @@ const Login = () => {
 
       <Dropdown.Menu style={{ minWidth: "300px" }}>
         <Form className="px-3 py-3" onSubmit={handleSubmit}>
-          <Form.Group className="mb-3" controlId="exampleDropdownFormEmail1">
+          <Form.Group className="mb-3" controlId="loginEmail">
             <Form.Label>Email address</Form.Label>
             <Form.Control
               type="email"
@@ -50,7 +50,7 @@ const Login = () => {
             />
           </Form.Group>
 
-          <Form.Group className="mb-3" controlId="exampleDropdownFormPassword1">
+          <Form.Group className="mb-3" controlId="loginPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
@@ -72,7 +72,7 @@ const Login = () => {
 
         <Dropdown.Divider />
 
-        <Dropdown.Item href="#">New around here? Sign up</Dropdown.Item>
+        <Dropdown.Item href="/register">New around here? Sign up</Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
   );

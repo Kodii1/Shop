@@ -80,6 +80,30 @@ export const AuthProvider = ({ children }) => {
       return { success: false, error: errorMessage };
     }
   };
+  const register = async (credentials) => {
+    try {
+      const response = await axios.post("api/User/register", credentials);
+      const receivedToken = response.data;
+
+      if (receivedToken) {
+        setToken(receivedToken);
+        const decoded = jwtDecode(receivedToken);
+        setUser({
+          email: decoded.email,
+          name: decoded.given_name,
+          role: decoded.role,
+        });
+        return { success: true };
+      } else {
+        return { success: false, error: ["Token not found in API response"] };
+      }
+    } catch (error) {
+      const backendErrors = error.response?.data?.[""] || [
+        error.response?.data?.message || "Register failed",
+      ];
+      return { success: false, errors: backendErrors };
+    }
+  };
 
   const logout = () => {
     setToken(null);
@@ -89,6 +113,7 @@ export const AuthProvider = ({ children }) => {
   const contextValue = {
     token,
     user,
+    register,
     login,
     logout,
     isLoading,
