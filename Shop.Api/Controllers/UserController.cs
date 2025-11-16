@@ -6,7 +6,6 @@ using Shop.Api.Interfaces;
 using Shop.Api.Mappers;
 using Shop.Api.Models;
 
-
 namespace Shop.Api.Controllers;
 
 [Route("api/[controller]")]
@@ -17,15 +16,18 @@ public class UserController : ControllerBase
     private readonly SignInManager<ApplicationUser> _singInManager;
     private readonly IJwtService _jwtService;
 
-    public UserController(UserManager<ApplicationUser> userManager,
-        SignInManager<ApplicationUser> signInManager, IJwtService jwtService)
+    public UserController(
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
+        IJwtService jwtService
+    )
     {
         _userManager = userManager;
         _singInManager = signInManager;
         _jwtService = jwtService;
     }
 
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "Admin")]
     [HttpGet("{id}")]
     public async Task<ActionResult<UserDto>> GetUserAsync(string id)
     {
@@ -38,7 +40,8 @@ public class UserController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> RegisterAsync(UserRegisterDto userRegisterDto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
         try
         {
@@ -54,7 +57,7 @@ public class UserController : ControllerBase
                 return BadRequest(ModelState);
             }
 
-            await _userManager.AddToRoleAsync(user, "USER");
+            await _userManager.AddToRoleAsync(user, "User");
 
             var token = await _jwtService.GenerateToken(user);
 
@@ -64,23 +67,28 @@ public class UserController : ControllerBase
         {
             return StatusCode(500, new { Error = "Internal server error" });
         }
-
     }
 
     [HttpPost("login")]
     public async Task<ActionResult> LoginAsync(UserLoginDto userLoginDto)
     {
-        if (!ModelState.IsValid) return BadRequest(ModelState);
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
 
         var user = await _userManager.FindByEmailAsync(userLoginDto.Email);
-        if (user == null) return BadRequest("Wrong Email");
+        if (user == null)
+            return BadRequest("Wrong Email");
 
-        var result = await _singInManager.CheckPasswordSignInAsync(user, userLoginDto.Password, false);
-        if (!result.Succeeded) return BadRequest("Wrong Password");
+        var result = await _singInManager.CheckPasswordSignInAsync(
+            user,
+            userLoginDto.Password,
+            false
+        );
+        if (!result.Succeeded)
+            return BadRequest("Wrong Password");
 
         var token = await _jwtService.GenerateToken(user);
 
         return Ok(token);
-
     }
 }

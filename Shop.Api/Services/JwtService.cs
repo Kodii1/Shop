@@ -8,10 +8,8 @@ using Shop.Api.Models;
 
 namespace Shop.Api.Services;
 
-
 public class JwtService : IJwtService
 {
-
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApplicationUser> _userManager;
 
@@ -43,7 +41,7 @@ public class JwtService : IJwtService
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = credentials,
             Issuer = _configuration["Jwt:Issuer"],
-            Audience = _configuration["Jwt:Audience"]
+            Audience = _configuration["Jwt:Audience"],
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();
