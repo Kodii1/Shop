@@ -1,10 +1,8 @@
 import { Image, Button, Dropdown } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import avatarIcon from "../assets/avatar.png";
-
 const UserMenu = () => {
   const { user, logout } = useAuth();
-
   return (
     <Dropdown align="end">
       {user?.name}
@@ -23,9 +21,11 @@ const UserMenu = () => {
         />
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-        <Dropdown.Item href="/dashboard">Dashboard</Dropdown.Item>
-        <Dropdown.Divider />
+        {user?.role === "Admin" && (
+          <Dropdown.Item href="/ProductManagement">
+            Modify Product
+          </Dropdown.Item>
+        )}
         <Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
